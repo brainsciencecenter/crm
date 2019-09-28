@@ -25,4 +25,5 @@ module "host-project" {
   network_name      = var.network_name
   project_id        = var.host_project_id
   billing_account   = var.billing_account
+  region            = var.region
 }

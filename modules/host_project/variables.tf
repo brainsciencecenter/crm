@@ -36,3 +36,9 @@ variable "project_id" {
   description = "The name assigned to the VPC host project."
   type        = string
 }
+
+variable "region" {
+  description = "Region where the resources will be deployed"
+  type        = "string"
+  default     = "us-east1"
+}

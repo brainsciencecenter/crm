@@ -7,6 +7,11 @@
 *  In a future version, we will add iam policies for the bsc-admin  role to align with bsc-admins@<domain>
 */
 
+locals {
+  subnet_01             = "${var.network_name}-license-subnet"
+  subnet_02             = "${var.network_name}-fileserver-subnet"
+}
+
 /******************************************
   Project random id suffix configuration
  *****************************************/
@@ -46,12 +51,29 @@ resource "google_project_services" "project" {
 resource "google_compute_network" "network" {
   name    = var.network_name
   project = google_project.project.project_id
+  auto_create_subnetworks = false
   depends_on = [google_project.project,google_project_services.project]
 }
 
 resource "google_compute_shared_vpc_host_project" "host" {
   project = google_project.project.project_id
   depends_on = [google_compute_network.network]
+}
+
+resource "google_compute_subnetwork" "license_subnet" {
+  name          = "${local.subnet_01}"
+  ip_cidr_range = "10.10.0.0/16"
+  region        = "${var.region}"
+  network       = "${google_compute_network.network.self_link}"
+  project = google_project.project.project_id
+}
+
+resource "google_compute_subnetwork" "fileserver_subnet" {
+  name          = "${local.subnet_02}"
+  ip_cidr_range = "10.20.0.0/16"
+  region        = "${var.region}"
+  network       = "${google_compute_network.network.self_link}"
+  project = google_project.project.project_id
 }
 
 
