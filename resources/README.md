@@ -2,6 +2,21 @@
 
 This directory hosts the terraform scripts for creating the GCP resources and desired folder hierarchy for the BSC POC project.
 
+## Pre-requisites
+[An excellent tutorial for getting started with resource management with terraform](https://cloud.google.com/community/tutorials/managing-gcp-projects-with-terraform)
+Follow the tutorial through the sections
+
+* Set up the environment
+* Create the Terraform Admin Project
+* Create the Terraform service account
+
+For permissions, the service account will need the following permissions
+
+* Compute Admin ( at parent resource node level or organization level )
+* Folder Admin ( at parent resource node level or organization level )
+* Billing Account User ( at parent resource node level or organization level )
+* Project Creator ( at parent resource node level or organization level )
+
 ## Usage
 
 To use these scripts, edit the provided terraform variables file ( template.tfvars )
