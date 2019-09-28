@@ -7,6 +7,11 @@
 *  In a future version, we will add iam policies for the bsc-admin  role to align with bsc-admins@<domain>
 */
 
+variable "billing_account" {
+  description = "Billing account ID associated with the host and service projects."
+  type        = string
+}
+
 variable "folder_id" {
   description = "The name of the folder hosting the resources."
   type        = string

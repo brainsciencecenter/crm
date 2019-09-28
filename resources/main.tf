@@ -11,18 +11,18 @@ provider "google" {
 }
 
 // Create a folder to host all of the resources
-resource "google_folder" "bscservices" {
-  display_name = "BSC Services"
-  parent = var.parent_folder_id
+resource "google_folder" "servicesfolder" {
+  display_name = var.parent_folder_name
+  parent       = var.parent_resource_node
 }
 
 // Create the  Shared VPC host project and the VPC network
 module "host-project" {
   source            = "../modules/host_project"
-  folder_id         = google_folder.bscservices.id
+  folder_id         = "${google_folder.servicesfolder.name}"
   name              = var.host_project_name
   org_id            = var.organization_id
-  credentials_path  = local.credentials_file_path
-  network_name      = var.bsc_vpc_name
-  project_id        = var.project_id
+  network_name      = var.network_name
+  project_id        = var.host_project_id
+  billing_account   = var.billing_account
 }

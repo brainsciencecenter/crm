@@ -1,4 +1,6 @@
 # BSC Pilot Project - Infrastructure as Code
+The scripts in this project are adapted from https://github.com/terraform-google-modules/terraform-google-project-factory.git
+
 
 ## Participants : 
 
