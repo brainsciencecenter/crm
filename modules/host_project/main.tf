@@ -76,4 +76,20 @@ resource "google_compute_subnetwork" "fileserver_subnet" {
   project = google_project.project.project_id
 }
 
+resource "google_compute_firewall" "ssh-firewall-rule" {
+  name    = "ssh-firewall-rule"
+  network = "${google_compute_network.network.name}"
+  source_ranges = ["0.0.0.0/0"]
+  project = google_project.project.project_id
 
+  allow {
+    protocol = "icmp"
+  }
+
+  allow {
+    protocol = "tcp"
+    ports    = ["22"]
+  }
+
+
+}
