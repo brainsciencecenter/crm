@@ -1,4 +1,5 @@
 host_project_name       = "host-project"
+service_project_name    = "service-project"
 parent_folder_name      = "services"
 network_name            = "host-network"
 region                  = "us-east1"

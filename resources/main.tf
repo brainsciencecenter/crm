@@ -1,7 +1,5 @@
 locals {
   credentials_file_path = var.credentials_path
-  subnet_01             = "${var.network_name}-license-subnet"
-  subnet_02             = "${var.network_name}-fileserver-subnet"
 }
 
 // Configure the Google Cloud provider
@@ -24,6 +22,19 @@ module "host-project" {
   org_id            = var.organization_id
   network_name      = var.network_name
   project_id        = var.host_project_id
+  billing_account   = var.billing_account
+  region            = var.region
+}
+
+// Create the  Shared VPC service project and the VPC network
+module "service-project" {
+  source            = "../modules/service_project"
+  folder_id         = "${google_folder.servicesfolder.name}"
+  name              = var.service_project_name
+  host_project_id   = module.host-project.host_project_id
+  org_id            = var.organization_id
+  network_name      = var.network_name
+  project_id        = var.service_project_id
   billing_account   = var.billing_account
   region            = var.region
 }
