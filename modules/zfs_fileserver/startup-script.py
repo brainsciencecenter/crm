@@ -12,7 +12,6 @@
 import subprocess
 import shlex
 import os
-from parse import compile
 
 def update_centos_kernel( ):
 
@@ -23,20 +22,32 @@ def update_centos_kernel( ):
 
 #END update_centos_kernel
 
+def setup_selinux():
+
+    subprocess.call(shlex.split('setenforce 0'))
+    f = open('/etc/selinux/config', 'w')
+    f.write("""
+SELINUX=permissive
+SELINUXTYPE=targeted
+""")
+    f.close()
+#END setup_selinux()
+
+
 def setup_secondary_disk( ):
 
     # Reformat the secondary disk to ext4
-    subprocess.call( shlex.split('mkfs.ext4 -m 0 -F -E lazy_itable_init=0,lazy_journal_init=0,discard /dev/sdb') )
+    #subprocess.call( shlex.split('mkfs.ext4 -m 0 -F -E lazy_itable_init=0,lazy_journal_init=0,discard /dev/sdb') )
 
     # Create a mount point for the storage disk and make it writeable by all
     subprocess.call( shlex.split('mkdir -p /mnt/zfs') )
     subprocess.call( shlex.split('chmod a+w /mnt/disks/zfs') )
 
     # Add the fstab entry for this
-    subprocess.call( shlex.split('echo UUID=`sudo blkid -s UUID -o value /dev/sdb` /mnt/zfs ext4 discard,defaults,nofail 0 2 | sudo tee -a /etc/fstab') )
+    #subprocess.call( shlex.split('echo UUID=`sudo blkid -s UUID -o value /dev/sdb` /mnt/zfs ext4 discard,defaults,nofail 0 2 | sudo tee -a /etc/fstab') )
 
     # Mount the disk
-    subprocess.call( shlex.split('mount -a') )
+    #subprocess.call( shlex.split('mount -a') )
 
 
 #END setup_secondary_disk
@@ -47,20 +58,34 @@ def install_zfs( ):
                  'kernel-headers',
                  'epel-release',
                  'dkms',
+                 'http://download.zfsonlinux.org/epel/zfs-release.el7_7.noarch.rpm',
                  'zfs' ]
 
     while subprocess.call(['yum', 'install', '-y'] + packages):
         print "yum failed to install packages. Trying again in 5 seconds"
         time.sleep(5)
 
+    subprocess.call( shlex.split('/sbin/modprobe zfs') )
+    subprocess.call( shlex.split('zpool create data-pool /dev/sdb') )
+
+
+    # Touch a file to indicate zfs has been installed 
+    # This prevents running through this again if the instances is rebooted.
+    subprocess.call( shlex.split('touch /opt/zfs-installed') )
+
 #END install_zfs
 
 def main( ):
 
     if not os.path.exists('/opt/kernel-updated'):
+        setup_selinux( )
         update_centos_kernel( )
 
-    setup_secondary_disk( )
+    if not os.path.exists('/opt/zfs-installed'):
+        setup_secondary_disk( )
+        install_zfs( )
 
-    install_zfs( )
+
+if __name__ == '__main__':
+    main()
 
