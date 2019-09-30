@@ -47,7 +47,7 @@ resource "google_compute_instance" "zfs-fileserver" {
     enable-oslogin = "TRUE"
   }
 
-  metadata_startup_script = "${file("./startup-script.py")}"
+  metadata_startup_script = file("${path.module}/startup-script.py")
 
   project = var.project_id
 

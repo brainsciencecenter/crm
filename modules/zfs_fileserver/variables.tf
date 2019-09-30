@@ -8,7 +8,7 @@
 */
 
 variable "name" {
-  description = "The name for the project"
+  description = "The name for the ZFS server"
   type        = string
 }
 
