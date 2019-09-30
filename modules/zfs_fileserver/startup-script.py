@@ -33,40 +33,19 @@ SELINUXTYPE=targeted
     f.close()
 #END setup_selinux()
 
-
-def setup_secondary_disk( ):
-
-    # Reformat the secondary disk to ext4
-    #subprocess.call( shlex.split('mkfs.ext4 -m 0 -F -E lazy_itable_init=0,lazy_journal_init=0,discard /dev/sdb') )
-
-    # Create a mount point for the storage disk and make it writeable by all
-    subprocess.call( shlex.split('mkdir -p /mnt/zfs') )
-    subprocess.call( shlex.split('chmod a+w /mnt/disks/zfs') )
-
-    # Add the fstab entry for this
-    #subprocess.call( shlex.split('echo UUID=`sudo blkid -s UUID -o value /dev/sdb` /mnt/zfs ext4 discard,defaults,nofail 0 2 | sudo tee -a /etc/fstab') )
-
-    # Mount the disk
-    #subprocess.call( shlex.split('mount -a') )
-
-
-#END setup_secondary_disk
-
 def install_zfs( ):
 
     packages = [ 'kernel-devel',
                  'kernel-headers',
                  'epel-release',
-                 'dkms',
-                 'http://download.zfsonlinux.org/epel/zfs-release.el7_7.noarch.rpm',
-                 'zfs' ]
+                 'dkms']
 
     while subprocess.call(['yum', 'install', '-y'] + packages):
         print "yum failed to install packages. Trying again in 5 seconds"
         time.sleep(5)
 
-    subprocess.call( shlex.split('/sbin/modprobe zfs') )
-    subprocess.call( shlex.split('zpool create data-pool /dev/sdb') )
+    subprocess.call( shlex.split('yum install -y http://download.zfsonlinux.org/epel/zfs-release.el7_7.noarch.rpm') )
+    subprocess.call( shlex.split('yum install -y zfs') )
 
 
     # Touch a file to indicate zfs has been installed 
@@ -74,6 +53,17 @@ def install_zfs( ):
     subprocess.call( shlex.split('touch /opt/zfs-installed') )
 
 #END install_zfs
+def setup_zfs( ):
+
+    # Create a mount point for the storage disk and make it writeable by all
+    subprocess.call( shlex.split('mkdir -p /mnt/zfs') )
+    subprocess.call( shlex.split('chmod a+w /mnt/disks/zfs') )
+
+    # Initialize ZFS with modprobe and set up mount from /dev/sdb
+    subprocess.call( shlex.split('/sbin/modprobe zfs') )
+    subprocess.call( shlex.split('zpool create -m /mnt/zfs data-pool /dev/sdb') )
+
+#END setup_zfs
 
 def main( ):
 
@@ -82,8 +72,8 @@ def main( ):
         update_centos_kernel( )
 
     if not os.path.exists('/opt/zfs-installed'):
-        setup_secondary_disk( )
         install_zfs( )
+        setup_zfs( )
 
 
 if __name__ == '__main__':
