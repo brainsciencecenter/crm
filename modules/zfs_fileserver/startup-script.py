@@ -62,8 +62,25 @@ def setup_zfs( ):
     # Initialize ZFS with modprobe and set up mount from /dev/sdb
     subprocess.call( shlex.split('/sbin/modprobe zfs') )
     subprocess.call( shlex.split('zpool create -m /mnt/zfs data-pool /dev/sdb') )
+    subprocess.call( shlex.split('zfs set sharenfs=on data-pool') )
 
 #END setup_zfs
+
+def install_nfs():
+
+    subprocess.call( shlex.split('yum install -y nfs-utils') )
+    f = open('/etc/sysconfig/nfs', 'a')
+    f.write("""
+# Added by Google
+RPCNFSDCOUNT=256
+""")
+    f.close()
+    
+    # Export at the end to signal that everything is up
+    subprocess.call(shlex.split('systemctl enable nfs-server'))
+    subprocess.call(shlex.split('systemctl start nfs-server'))
+
+# END install_nfs()
 
 def main( ):
 
@@ -73,7 +90,9 @@ def main( ):
 
     if not os.path.exists('/opt/zfs-installed'):
         install_zfs( )
+        install_nfs( )
         setup_zfs( )
+
 
 
 if __name__ == '__main__':
