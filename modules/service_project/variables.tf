@@ -15,19 +15,19 @@ variable "host_vpc_project_id"{
   description = "example"
 }
 
-variable 'name' {
+variable "name" {
   type = string
 }
 
-variable 'parent_folder' {
+variable "parent_folder" {
   type = string
 }
 
-variable 'host_vpc_network' {
+variable "host_vpc_network" {
   type = string
 }
 
-variable 'network_resources' {
+variable "network_resources" {
   type = list(object({
       subnet_name      = string
       subnet_cidr      = string

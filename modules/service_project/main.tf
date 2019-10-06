@@ -29,8 +29,8 @@ resource "google_project_services" "project" {
 }
 
 resource "google_compute_shared_vpc_service_project" "service" {
-  host_project    = var.host_project_id
-  = google_project.project.number
+  host_project    = var.host_vpc_project_id
+  service_project = google_project.project.number
 }
 
 # Within the project, create the network, storage, and compute resources
@@ -45,17 +45,33 @@ resource "google_compute_subnetwork" "subnets" {
   project       = var.host_vpc_project_id
 }
 
+
 resource "google_compute_firewall" "firewall-rules" {
   count         = length(var.network_resources)
   name          = var.network_resources[count.index].firewall_name
   source_ranges = var.network_resources[count.index].source_ranges
-  allow         = var.network_resources[count.index].allow
   target_tags   = var.network_resources[count.index].target_tags
-  network       = var.host_vcp_network
+  network       = var.host_vpc_network
   project       = var.host_vpc_project_id
+
+  dynamic "allow"{
+    for_each = "${var.network_resources[count.index].allow}"
+    content {
+      protocol = allow.value.protocol
+      ports    = allow.value.ports
+    }
+  }
 }
 
 
+/***********
+
+module "storage" {
+  source               = "../modules/zfs_fileserver"
+  name                 = var.zfs_server_name 
+  machine_type         = var.zfs_machine_type
+  subnet_name          = local.fileserver_subnet
+  project_id           = module.service-project.project_id
 /***********
 
 module "storage" {
@@ -70,7 +86,7 @@ module "storage" {
   storage_disk_size_gb = var.zfs_storage_size_gb
   zone                 = var.zone
 }
-}
+
 
 module "compute" {
 }

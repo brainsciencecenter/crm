@@ -19,12 +19,13 @@ module "host_project" {
   billing_account  = var.billing_account
 }
 
-/*
 // Create the service projects and their associated resources
 module "service_project"{
-  source           = "../modules/service_project"
-  service_project  = service_projects[0]
-  billing_account  = var.billing_account
+  source              = "../modules/service_project"
+  billing_account     = var.billing_account
   host_vpc_project_id = module.host_project.project_id
+  host_vpc_network    = var.host_project.network_name
+  parent_folder       = google_folder.servicesfolder.name
+  name                = var.service_projects[0].name
+  network_resources   = var.service_projects[0].network_resources
 }
-*/
