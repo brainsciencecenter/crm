@@ -7,38 +7,28 @@
 *  In a future version, we will add iam policies for the bsc-admin  role to align with bsc-admins@<domain>
 */
 
-variable "billing_account" {
-  description = "Billing account ID associated with the host and service projects."
-  type        = string
+variable "parent_folder"{
+  type = string
 }
 
-variable "folder_id" {
-  description = "The name of the folder hosting the resources."
-  type        = string
+variable "name"{
+  type = string
 }
 
-variable "name" {
-  description = "The name for the project"
-  type        = string
+variable "billing_account"{
+  type = string
 }
 
-variable "network_name" {
-  description = "The name of the shared VPC network"
-  type        = string
+variable "network_name"{
+  type = string
 }
 
-variable "org_id" {
-  description = "The organization ID."
-  type        = string
+variable "project_id_base"{
+  type = string
 }
 
-variable "project_id" {
-  description = "The name assigned to the VPC host project."
-  type        = string
+/*
+variable "region"{
+  type = string
 }
-
-variable "region" {
-  description = "Region where the resources will be deployed"
-  type        = "string"
-  default     = "us-east1"
-}
+*/
