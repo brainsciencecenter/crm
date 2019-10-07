@@ -25,7 +25,7 @@ variable "host_project"{
 variable "service_projects"{
   type = list(object({
     name                 = string
-    network_resources    = list(object({
+    network_resources    = object({
       subnet_name      = string
       subnet_cidr      = string
       subnet_region    = string
@@ -36,6 +36,6 @@ variable "service_projects"{
         protocol = string
         ports    = list(string)
       }))
-    }))
+    })
   }))
 }

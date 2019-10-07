@@ -12,8 +12,8 @@ host_project={
 service_projects = [
 { name            = service-project
   parent_folder   = "services"
-  network_resources = [
-  { subnet_name = "subnet1"
+  network_resources = {
+    subnet_name = "subnet1"
     subnet_cidr = "10.10.0.0/16"
     subnet_region = "us-east1"
     firewall_name = "subnet1-firewall"
@@ -23,5 +23,5 @@ service_projects = [
     { protocol = "tcp"
       ports    = ["22"]
     }]
-  }]
+  }
 }]

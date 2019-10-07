@@ -38,6 +38,34 @@ resource "google_compute_shared_vpc_service_project" "service" {
 
 # Within the project, create the network, storage, and compute resources
 
+# Subnets within shared VPC
+resource "google_compute_subnetwork" "subnets" {
+  count         = length(var.service_projects)
+  name          = var.service_projects[count.index].network_resources.subnet_name
+  ip_cidr_range = var.service_projects[count.index].network_resources.subnet_cidr
+  region        = var.service_projects[count.index].network_resources.subnet_region
+  network       = var.host_vpc_network
+  project       = var.host_vpc_project_id
+}
+
+
+resource "google_compute_firewall" "firewall-rules" {
+  count         = length(var.service_projects)
+  name          = var.service_projects[count.index].network_resources.firewall_name
+  source_ranges = var.service_projects[count.index].network_resources.source_ranges
+  target_tags   = var.service_projects[count.index].network_resources.target_tags
+  network       = var.host_vpc_network
+  project       = var.host_vpc_project_id
+
+  dynamic "allow"{
+    for_each = "${var.service_projects[count.index].network_resources.allow}"
+    content {
+      protocol = allow.value.protocol
+      ports    = allow.value.ports
+    }
+  }
+}
+
 
 
 /***********
