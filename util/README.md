@@ -4,6 +4,12 @@ This directory contains useful tools for managing Cloud Identity and OS Login in
 
 ## Getting Started
 
+### Enable APIs
+```
+gcloud services enable admin.googleapis.com
+```
+
+### Creating new credentials
 1. On your local system
 ```
 pip install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib
@@ -25,7 +31,6 @@ pip install --upgrade google-api-python-client google-auth-httplib2 google-auth-
 ```
 mv ~/Downloads/client_secret.json ./credentials.json
 ```
-
 
 ## Updating user POSIX information
 The provided script `update_directory.py` is used to update the POSIX username, user id (uid), group id (gid), home directory, and default shell associated with a Cloud Identity or GSuite e-mail address.
