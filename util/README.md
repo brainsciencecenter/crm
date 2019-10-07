@@ -11,13 +11,17 @@ pip install --upgrade google-api-python-client google-auth-httplib2 google-auth-
 
 2. Go to https://console.cloud.google.com
 
-3. Navigate to APIs & Services > Credentials
+3. Navigate to APIs & Services > OAuth Consent Screen
 
-4. Create Credentials > OAuth Client ID. Set the Application Type to Other. Provide a name for the application/auth token. Click "OK" at the prompt.
+4. Set `Application Type = Internal` and `Application Name = Update Directory`. Click Save.
 
-5. To the right of your new credentials, click on the Download icon
+5. Navigate to APIs & Services > Credentials
 
-6. On your local system, move the downloaded json to this directory with the filename "credentials.json"
+6. Create Credentials > OAuth Client ID. Set the Application Type to Other. Provide a name for the application/auth token (e.g. python client). Click "OK" at the prompt.
+
+7. To the right of your new credentials, click on the Download icon
+
+8. On your local system, move the downloaded json to this directory with the filename "credentials.json"
 ```
 mv ~/Downloads/client_secret.json ./credentials.json
 ```
