@@ -19,12 +19,21 @@ module "host_project" {
   billing_account  = var.billing_account
 }
 
-// Create the service projects and their associated resources
-module "service_projects"{
-  source              = "../modules/service_project"
+module "license_project"{
+  source              = "../modules/license_project"
   billing_account     = var.billing_account
   host_vpc_project_id = module.host_project.project_id
   host_vpc_network    = var.host_project.network_name
   parent_folder       = google_folder.servicesfolder.name
-  service_projects    = var.service_projects
+  license_project     = var.license_project
+}
+
+// Create the service projects and their associated resources
+module "user_projects"{
+  source              = "../modules/user_projects"
+  billing_account     = var.billing_account
+  host_vpc_project_id = module.host_project.project_id
+  host_vpc_network    = var.host_project.network_name
+  parent_folder       = google_folder.servicesfolder.name
+  service_projects    = var.user_projects
 }

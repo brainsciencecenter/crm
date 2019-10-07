@@ -25,7 +25,7 @@ This repository contains two main directories
 2. resources
 
 ### Modules
-The modules subdirectory contains terraform modules for creating a host project (VPC Host Project) and service projects.
+The modules subdirectory contains terraform modules for creating a host project (VPC Host Project) and service projects ( user projects and license project ).
 
 The host project is used for managing the VPC network, subnets, and firewall rules.
 

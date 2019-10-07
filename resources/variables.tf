@@ -22,7 +22,32 @@ variable "host_project"{
   })
 }
 
-variable "service_projects"{
+variable "license_project"{
+  type = object({
+    name                 = string
+    network_resources    = object({
+      subnet_name      = string
+      subnet_cidr      = string
+      subnet_region    = string
+      firewall_name    = string
+      source_ranges    = list( string )
+      target_tags      = list( string )
+      allow            = list(object({
+        protocol = string
+        ports    = list(string)
+      }))
+    })
+    compute_resources = list(object({
+      server_name  = string
+      machine_type = string
+      disk_type    = string
+      disk_size_gb = string
+      zone         = string
+    }))
+  })
+}
+
+variable "user_projects"{
   type = list(object({
     name                 = string
     network_resources    = object({
@@ -47,3 +72,4 @@ variable "service_projects"{
     })
   }))
 }
+
