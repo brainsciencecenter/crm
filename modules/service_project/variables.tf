@@ -15,9 +15,6 @@ variable "host_vpc_project_id"{
   description = "example"
 }
 
-variable "name" {
-  type = string
-}
 
 variable "parent_folder" {
   type = string
@@ -27,8 +24,10 @@ variable "host_vpc_network" {
   type = string
 }
 
-variable "network_resources" {
+variable "service_projects" {
   type = list(object({
+    name              = string
+    network_resources = list(object({
       subnet_name      = string
       subnet_cidr      = string
       subnet_region    = string
@@ -39,6 +38,7 @@ variable "network_resources" {
         protocol = string
         ports    = list(string)
       }))
-  
+    }))
   }))
+  description = "An object describing a list of service projects and its resources"
 }
