@@ -8,6 +8,25 @@
 */
 
 
+locals {
+ subnet_names          = [for proj in var.service_projects : proj.network_resources.subnet_name]
+ subnet_cidrs          = [for proj in var.service_projects : proj.network_resources.subnet_cidr]
+ subnet_regions        = [for proj in var.service_projects : proj.network_resources.subnet_region]
+ subnet_allows         = [for proj in var.service_projects : proj.network_resources.allow]
+ firewall_names        = [for proj in var.service_projects : proj.network_resources.firewall_name]
+ source_ranges         = [for proj in var.service_projects : proj.network_resources.source_ranges]
+ target_tags           = [for proj in var.service_projects : proj.network_resources.target_tags]
+ 
+ storage_server_names  = [for proj in var.service_projects : proj.storage_resources.server_name]
+ storage_machine_types = [for proj in var.service_projects : proj.storage_resources.machine_type]
+ storage_disk_names    = [for proj in var.service_projects : proj.storage_resources.disk_name]
+ storage_disk_types    = [for proj in var.service_projects : proj.storage_resources.disk_type]
+ storage_disk_size_gbs = [for proj in var.service_projects : proj.storage_resources.disk_name]
+
+
+}
+
+
 /******************************************
   Project random id suffix configuration
  *****************************************/
@@ -22,6 +41,10 @@ resource "google_project" "project" {
   project_id = format("%s-%s",var.service_projects[count.index].name,random_id.random_project_id_suffix.hex)
   folder_id  = var.parent_folder
   billing_account = var.billing_account
+}
+
+locals {
+  project_id = [for proj in google_project.project : proj.number]
 }
 
 resource "google_project_services" "project" {
@@ -39,47 +62,23 @@ resource "google_compute_shared_vpc_service_project" "service" {
 # Within the project, create the network, storage, and compute resources
 
 # Subnets within shared VPC
-resource "google_compute_subnetwork" "subnets" {
-  count         = length(var.service_projects)
-  name          = var.service_projects[count.index].network_resources.subnet_name
-  ip_cidr_range = var.service_projects[count.index].network_resources.subnet_cidr
-  region        = var.service_projects[count.index].network_resources.subnet_region
-  network       = var.host_vpc_network
-  project       = var.host_vpc_project_id
+module "network" {
+  source = "./network"
+  subnet_names   = local.subnet_names
+  subnet_cidrs   = local.subnet_cidrs
+  subnet_regions = local.subnet_regions
+  allows         = local.subnet_allows
+  firewall_names = local.firewall_names
+  source_ranges  = local.source_ranges
+  target_tags    = local.target_tags
+  host_vpc_network = var.host_vpc_network
+  host_vpc_project_id = var.host_vpc_project_id
 }
 
-
-resource "google_compute_firewall" "firewall-rules" {
-  count         = length(var.service_projects)
-  name          = var.service_projects[count.index].network_resources.firewall_name
-  source_ranges = var.service_projects[count.index].network_resources.source_ranges
-  target_tags   = var.service_projects[count.index].network_resources.target_tags
-  network       = var.host_vpc_network
-  project       = var.host_vpc_project_id
-
-  dynamic "allow"{
-    for_each = "${var.service_projects[count.index].network_resources.allow}"
-    content {
-      protocol = allow.value.protocol
-      ports    = allow.value.ports
-    }
-  }
-}
-
-
-
-/***********
-
-module "storage" {
-  source               = "../modules/zfs_fileserver"
-  name                 = var.zfs_server_name 
-  machine_type         = var.zfs_machine_type
-  subnet_name          = local.fileserver_subnet
-  project_id           = module.service-project.project_id
-/***********
-
-module "storage" {
-  source               = "../modules/zfs_fileserver"
+/*
+# Create a zfs file server
+module "zfs-file-server" {
+  source            = "${path.module}/storagezfs_fileserver"
   name                 = var.zfs_server_name 
   machine_type         = var.zfs_machine_type
   subnet_name          = local.fileserver_subnet
@@ -89,9 +88,5 @@ module "storage" {
   storage_disk_type    = var.zfs_storage_disk_type
   storage_disk_size_gb = var.zfs_storage_size_gb
   zone                 = var.zone
-}
-
-
-module "compute" {
 }
 ***********/

@@ -24,4 +24,11 @@ service_projects = [
       ports    = ["22"]
     }]
   }
+  storage_resources = {
+    server_name  = "zfs-fileserver"
+    machine_type = "n1-standard-4"
+    disk_name    = "zfs-fs-storage"
+    disk_type    = "pd-standard"
+    disk_size_gb = "2000"
+  }
 }]

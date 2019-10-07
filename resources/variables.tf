@@ -37,5 +37,12 @@ variable "service_projects"{
         ports    = list(string)
       }))
     })
+    storage_resources = object({
+      server_name  = string
+      machine_type = string
+      disk_name    = string
+      disk_type    = string
+      disk_size_gb = string
+    })
   }))
 }
