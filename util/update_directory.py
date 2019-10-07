@@ -1,11 +1,13 @@
-#!/usr/bin/env python3
+#!/usr/bin/python
 
+import pickle
 import argparse
 import os
 import googleapiclient.discovery
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 
+import pprint
 SCOPES = ['https://www.googleapis.com/auth/admin.directory.user']
 
 def get_credentials():
@@ -47,33 +49,38 @@ def update_user_posix_credentials(user_email, home_dir, username, shell, uid, gi
 
     # Verify that the user has a posixAccount
 
-    posix_account = user['posixAccounts'][0]
-    print('Existing POSIX account info:')
-    print(posix_account)
+    if 'posixAccounts' in user.keys():
+        posix_account = user['posixAccounts'][0]
+        print('Existing POSIX account info:')
+        print(posix_account)
 
-    # Update credentials
+        # Update credentials
 
-    if home_dir:
-        posix_account['homeDirectory'] = home_dir
+        if home_dir:
+            posix_account['homeDirectory'] = home_dir
 
-    if username:
-        posix_account['username'] = username
+        if username:
+            posix_account['username'] = username
 
-    if shell:
-        posix_account['shell'] = shell
+        if shell:
+            posix_account['shell'] = shell
 
-    if uid:
-        posix_account['uid'] = str(uid)
+        if uid:
+            posix_account['uid'] = str(uid)
 
-    if gid:
-        posix_account['gid'] = str(gid)
+        if gid:
+            posix_account['gid'] = str(gid)
 
-    update_command = service.users().update(userKey=user_email,
-                                            body={'posixAccounts': [posix_account]})
-    update_command.execute()
+        update_command = service.users().update(userKey=user_email,
+                                                body={'posixAccounts': [posix_account]})
+        update_command.execute()
 
-    print('POSIX account info updated; changes may take a few seconds to propagate. '
-          'Check `gcloud beta compute os-login describe-profile` for changes')
+        print('POSIX account info updated; changes may take a few seconds to propagate. '
+              'Check `gcloud beta compute os-login describe-profile` for changes')
+    else:
+        print('Error: posixAccounts is not associated with output of admin.users().get()')
+        pprint.pprint( user )
+        print('Nothing updated')
 
 
 def main():
