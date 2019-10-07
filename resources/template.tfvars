@@ -10,7 +10,7 @@ host_project={
 }
 
 service_projects = [
-{ name            = service-project
+{ name            = "service-project-sandbox"
   parent_folder   = "services"
   network_resources = {
     subnet_name = "subnet1"
@@ -30,5 +30,6 @@ service_projects = [
     disk_name    = "zfs-fs-storage"
     disk_type    = "pd-standard"
     disk_size_gb = "2000"
+    zone         = "us-east1-b"
   }
 }]

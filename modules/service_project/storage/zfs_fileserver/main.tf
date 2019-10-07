@@ -8,18 +8,20 @@
 */
 
 resource "google_compute_disk" "zfs-storage-disk" {
-  name  = var.storage_disk_name
-  type  = var.storage_disk_type
-  zone  = var.zone
+  count = length(var.name)
+  name  = var.storage_disk_name[count.index]
+  type  = var.storage_disk_type[count.index]
+  zone  = var.zone[count.index]
   physical_block_size_bytes = 4096
-  project = var.project_id
+  project = var.project_id[count.index]
 }
 
 
 resource "google_compute_instance" "zfs-fileserver" {
-  name         = var.name
-  machine_type = var.machine_type
-  zone         = var.zone
+  count = length(var.name)
+  name         = var.name[count.index]
+  machine_type = var.machine_type[count.index]
+  zone         = var.zone[count.index]
 
   boot_disk {
     initialize_params {
@@ -28,15 +30,15 @@ resource "google_compute_instance" "zfs-fileserver" {
   }
 
   attached_disk{
-    source = google_compute_disk.zfs-storage-disk.self_link
+    source = google_compute_disk.zfs-storage-disk[count.index].self_link
   }
 
   labels = {
   }
 
   network_interface {
-    subnetwork = var.subnet_name
-    subnetwork_project = var.host_project_id
+    subnetwork = var.subnet_name[count.index]
+    subnetwork_project = var.host_vpc_project_id
 
     access_config {
       // Ephemeral IP
@@ -49,10 +51,9 @@ resource "google_compute_instance" "zfs-fileserver" {
 
   metadata_startup_script = file("${path.module}/startup-script.py")
 
-  project = var.project_id
+  project = var.project_id[count.index]
 
   service_account {
     scopes = ["userinfo-email", "compute-ro", "storage-ro"]
   }
 }
-

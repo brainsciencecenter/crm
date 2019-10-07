@@ -22,6 +22,7 @@ locals {
  storage_disk_names    = [for proj in var.service_projects : proj.storage_resources.disk_name]
  storage_disk_types    = [for proj in var.service_projects : proj.storage_resources.disk_type]
  storage_disk_size_gbs = [for proj in var.service_projects : proj.storage_resources.disk_name]
+ storage_zones         = [for proj in var.service_projects : proj.storage_resources.zone]
 
 
 }
@@ -62,7 +63,7 @@ resource "google_compute_shared_vpc_service_project" "service" {
 # Within the project, create the network, storage, and compute resources
 
 # Subnets within shared VPC
-module "network" {
+module "network_resources" {
   source = "./network"
   subnet_names   = local.subnet_names
   subnet_cidrs   = local.subnet_cidrs
@@ -75,18 +76,18 @@ module "network" {
   host_vpc_project_id = var.host_vpc_project_id
 }
 
-/*
+
 # Create a zfs file server
 module "zfs-file-server" {
-  source            = "${path.module}/storagezfs_fileserver"
-  name                 = var.zfs_server_name 
-  machine_type         = var.zfs_machine_type
-  subnet_name          = local.fileserver_subnet
-  project_id           = module.service-project.project_id
-  host_project_id      = module.host-project.project_id
-  storage_disk_name    = var.zfs_storage_disk_name
-  storage_disk_type    = var.zfs_storage_disk_type
-  storage_disk_size_gb = var.zfs_storage_size_gb
-  zone                 = var.zone
+  source            = "./storage/zfs_fileserver"
+  name                 = local.storage_server_names 
+  machine_type         = local.storage_machine_types
+  subnet_name          = local.subnet_names
+  project_id           = local.project_id
+  host_vpc_project_id  = var.host_vpc_project_id
+  storage_disk_name    = local.storage_disk_names
+  storage_disk_type    = local.storage_disk_types
+  storage_disk_size_gb = local.storage_disk_size_gbs
+  zone                 = local.storage_zones
 }
-***********/
+

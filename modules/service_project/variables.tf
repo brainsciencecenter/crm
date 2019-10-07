@@ -45,6 +45,7 @@ variable "service_projects" {
       disk_name    = string
       disk_type    = string
       disk_size_gb = string
+      zone         = string
     })
   }))
   description = "An object describing a list of service projects and its resources"
