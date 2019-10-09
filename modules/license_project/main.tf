@@ -29,13 +29,11 @@ locals {
 }
 
 resource "google_project_services" "project" {
-  count    = length(var.license_project)
   project  = google_project.project.number
   services = ["iam.googleapis.com", "cloudresourcemanager.googleapis.com", "compute.googleapis.com", "oslogin.googleapis.com", "iamcredentials.googleapis.com"]
 }
 
 resource "google_compute_shared_vpc_service_project" "service" {
-  count           = length(var.license_project)
   host_project    = var.host_vpc_project_id
   service_project = google_project.project.number
 }
