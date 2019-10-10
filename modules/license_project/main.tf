@@ -36,13 +36,14 @@ resource "google_project_services" "project" {
 resource "google_compute_shared_vpc_service_project" "service" {
   host_project    = var.host_vpc_project_id
   service_project = google_project.project.number
+  depends_on = [google_project_services.project]
 }
 
 # Within the project, create the network, storage, and compute resources
 
 # Subnets within shared VPC
 resource "google_compute_subnetwork" "subnets" {
-  name          = var.license_project.network_resources.subnet_name
+  name          = "${var.license_project.name}-subnet"
   ip_cidr_range = var.license_project.network_resources.subnet_cidr
   region        = var.license_project.network_resources.subnet_region
   network       = var.host_vpc_network
@@ -51,9 +52,9 @@ resource "google_compute_subnetwork" "subnets" {
 
 
 resource "google_compute_firewall" "firewall-rules" {
-  name          = var.license_project.network_resources.firewall_name
+  name          = "${var.license_project.name}-firewall"
   source_ranges = var.license_project.network_resources.source_ranges
-  target_tags   = var.license_project.network_resources.target_tags
+  target_tags   = ["${var.license_project.name}"]
   network       = var.host_vpc_network
   project       = var.host_vpc_project_id
 
@@ -85,7 +86,7 @@ resource "google_compute_instance" "license-servers" {
   }
 
   network_interface {
-    subnetwork = var.license_project.network_resources.subnet_name
+    subnetwork = "${var.license_project.name}-subnet"
     subnetwork_project = var.host_vpc_project_id
 
     access_config {
@@ -102,6 +103,7 @@ resource "google_compute_instance" "license-servers" {
   service_account {
     scopes = ["userinfo-email", "compute-ro", "storage-ro"]
   }
-  tags   = var.license_project.network_resources.target_tags
+  tags   = ["${var.license_project.name}"]
+  depends_on = [google_project_services.project, google_compute_shared_vpc_service_project.service]
 }
 

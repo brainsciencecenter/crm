@@ -26,12 +26,9 @@ variable "license_project"{
   type = object({
     name                 = string
     network_resources    = object({
-      subnet_name      = string
       subnet_cidr      = string
       subnet_region    = string
-      firewall_name    = string
       source_ranges    = list( string )
-      target_tags      = list( string )
       allow            = list(object({
         protocol = string
         ports    = list(string)
@@ -41,7 +38,7 @@ variable "license_project"{
       server_name  = string
       machine_type = string
       disk_type    = string
-      disk_size_gb = string
+      disk_size_gb = number
       zone         = string
     }))
   })
