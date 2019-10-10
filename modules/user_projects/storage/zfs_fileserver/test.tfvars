@@ -1,9 +1,0 @@
-name                 = "zfs-test" 
-machine_type         = "n1-standard-4"
-subnet_name          = "host-network-fileserver-subnet"
-project_id           = "448955915644" 
-host_project_id      = "973568852943"
-storage_disk_name    = "zfs-disk1"
-storage_disk_type    = "pd-standard"
-storage_disk_size_gb = 500
-zone                 = "us-east1-b"

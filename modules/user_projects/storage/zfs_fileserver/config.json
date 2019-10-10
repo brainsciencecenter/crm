@@ -1,4 +1,0 @@
-{
- additional_disks=@ADDITIONAL_DISKS@,
- data_pools=@DATA_POOLS@
-}
