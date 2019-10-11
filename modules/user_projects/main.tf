@@ -91,6 +91,30 @@ resource "google_compute_firewall" "firewall-rules" {
   depends_on    = [google_compute_shared_vpc_service_project.service]
 }
 
+resource "google_compute_firewall" "internal-firewall-rules" {
+  count         = length(var.service_projects)
+  name          = "${var.service_projects[count.index].name}-all-internal-firewall"
+  source_ranges = [local.subnet_cidrs[count.index]]
+  target_tags   = ["${var.service_projects[count.index].name}"]
+  network       = var.host_vpc_network
+  project       = var.host_vpc_project_id
+
+  allow{
+    protocol = "tcp"
+    ports    = ["0-65535"]
+  }
+
+  allow{
+    protocol = "udp"
+    ports    = ["0-65535"]
+  }
+
+  allow{
+    protocol = "icmp"
+  }
+  depends_on    = [google_compute_shared_vpc_service_project.service]
+}
+
 // ZFS 
 resource "google_compute_disk" "zfs-storage-disk" {
   count = length(var.service_projects)
