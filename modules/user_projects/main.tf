@@ -29,7 +29,7 @@ locals {
   Project random id suffix configuration
  *****************************************/
 resource "random_id" "random_project_id_suffix" {
-  byte_length = 5
+  byte_length = 3
 }
 
 # Create the service project, enable needed APIs and mark it as a service project
@@ -100,8 +100,15 @@ resource "google_compute_disk" "zfs-storage-disk" {
   size  = local.storage_disk_size_gbs[count.index]
   physical_block_size_bytes = 4096
   project = local.project_id[count.index]
+  depends_on = [google_project_services.project]
 }
 
+resource "google_compute_address" "static_ip" {
+  count = length(var.service_projects)
+  name = "zfs-fileserver-address"
+  project  = local.project_id[count.index]
+  region   = var.service_projects[count.index].network_resources.subnet_region
+}
 
 resource "google_compute_instance" "zfs-fileserver" {
   count = length(var.service_projects)
@@ -127,7 +134,8 @@ resource "google_compute_instance" "zfs-fileserver" {
     subnetwork_project = var.host_vpc_project_id
 
     access_config {
-      // Ephemeral IP
+      // Static IP
+      nat_ip = google_compute_address.static_ip[count.index].address
     }
   }
 
@@ -140,9 +148,25 @@ resource "google_compute_instance" "zfs-fileserver" {
   project = local.project_id[count.index]
 
   service_account {
-    scopes = ["userinfo-email", "compute-ro", "storage-ro"]
+    scopes = ["storage-ro","logging-write","monitoring-write","service-control","service-management","pubsub"]
   }
   tags   = ["${var.service_projects[count.index].name}"]
 
-  depends_on = [google_compute_disk.zfs-storage-disk,google_compute_subnetwork.subnets]
+  depends_on = [google_compute_disk.zfs-storage-disk,google_compute_subnetwork.subnets,google_compute_address.static_ip]
+}
+
+
+// IAM Policies
+resource "google_project_iam_policy" "project" {
+  count = length(var.service_projects)
+  project  = local.project_id[count.index]
+  policy_data = "${data.google_iam_policy.user[count.index].policy_data}"
+}
+
+data "google_iam_policy" "user" {
+  count = length(var.service_projects)
+  binding {
+    role = "organizations/900475861822/roles/BSCInstanceUser"
+    members = var.service_projects[count.index].members
+  }
 }

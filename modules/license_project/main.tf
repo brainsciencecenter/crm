@@ -67,6 +67,12 @@ resource "google_compute_firewall" "firewall-rules" {
   }
 }
 
+resource "google_compute_address" "static_ip" {
+  name = "matlab-flexnet-address"
+  project  = google_project.project.number
+  region   = var.license_project.network_resources.subnet_region
+}
+
 # Create the license servers
 resource "google_compute_instance" "license-servers" {
   count        = length(var.license_project.compute_resources)
@@ -90,7 +96,8 @@ resource "google_compute_instance" "license-servers" {
     subnetwork_project = var.host_vpc_project_id
 
     access_config {
-      // Ephemeral IP
+      // Static IP
+      nat_ip = google_compute_address.static_ip.address
     }
   }
 
@@ -101,9 +108,9 @@ resource "google_compute_instance" "license-servers" {
   project = local.project_id
 
   service_account {
-    scopes = ["userinfo-email", "compute-ro", "storage-ro"]
+    scopes = ["storage-ro","logging-write","monitoring-write","service-control","service-management","pubsub"]
   }
   tags   = ["${var.license_project.name}"]
-  depends_on = [google_project_services.project, google_compute_shared_vpc_service_project.service]
+  depends_on = [google_project_services.project, google_compute_shared_vpc_service_project.service,google_compute_address.static_ip]
 }
 

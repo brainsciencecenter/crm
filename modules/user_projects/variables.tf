@@ -44,6 +44,7 @@ variable "service_projects" {
       disk_size_gb = number
       zone         = string
     })
+    members = list(string)
   }))
   description = "An object describing a list of service projects and its resources"
 }

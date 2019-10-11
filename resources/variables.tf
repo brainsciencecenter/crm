@@ -64,6 +64,7 @@ variable "user_projects"{
       disk_size_gb = number
       zone         = string
     })
+    members = list(string)
   }))
 }
 
