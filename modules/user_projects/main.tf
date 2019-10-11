@@ -115,6 +115,30 @@ resource "google_compute_firewall" "internal-firewall-rules" {
   depends_on    = [google_compute_shared_vpc_service_project.service]
 }
 
+resource "google_compute_router" "router" {
+  count         = length(var.service_projects)
+  name          = "${var.service_projects[count.index].name}-router"
+  network       = var.host_vpc_network
+  project       = var.host_vpc_project_id
+  region        = local.subnet_regions[count.index]
+  depends_on    = [google_compute_subnetwork.subnets]
+}
+
+resource "google_compute_router_nat" "nat" {
+  count         = length(var.service_projects)
+  name          = "${var.service_projects[count.index].name}-router-nat"
+  project       = var.host_vpc_project_id
+  region        = google_compute_router.router[count.index].region
+  router        = google_compute_router.router[count.index].name
+  nat_ip_allocate_option             = "AUTO_ONLY"
+  source_subnetwork_ip_ranges_to_nat = "LIST_OF_SUBNETWORKS"
+  subnetwork {
+        name                    = google_compute_subnetwork.subnets[count.index].self_link
+        source_ip_ranges_to_nat = ["PRIMARY_IP_RANGE"]
+    }
+}
+
+
 // ZFS 
 resource "google_compute_disk" "zfs-storage-disk" {
   count = length(var.service_projects)
