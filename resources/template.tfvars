@@ -22,7 +22,7 @@ license_project = {
   }
   compute_resources = [
     { server_name  = "matlab-flexnet"
-      machine_type = "n1-standard-4"
+      machine_type = "n1-standard-2"
       disk_type    = "pd-standard"
       disk_size_gb = 25
       zone         = "us-east1-b"
@@ -31,24 +31,44 @@ license_project = {
 }
 
 user_projects = [
-{ name            = "service-project-sandbox"
-  parent_folder   = "services"
-  network_resources = {
-    subnet_cidr = "10.20.0.0/16"
-    subnet_region = "us-east1"
-    source_ranges = ["0.0.0.0/0"]
-    allow = [
-    { protocol = "tcp"
-      ports    = ["22"]
-    }]
+  { name            = "detre-group"
+    network_resources = {
+      subnet_cidr = "10.20.0.0/16"
+      subnet_region = "us-east1"
+      source_ranges = ["0.0.0.0/0"]
+      allow = [
+      { protocol = "tcp"
+        ports    = ["22"]
+      }]
+    }
+    storage_resources = {
+      server_name  = "zfs-fileserver"
+      machine_type = "n1-standard-4"
+      disk_name    = "zfs-fs-storage"
+      disk_type    = "pd-standard"
+      disk_size_gb = 20000
+      zone         = "us-east1-b"
+    }
+    members = ["group:detre-group@gcp.pennbrain.upenn.edu"]
+  },
+  { name            = "another-group"
+    network_resources = {
+      subnet_cidr = "10.30.0.0/16"
+      subnet_region = "us-east1"
+      source_ranges = ["0.0.0.0/0"]
+      allow = [
+      { protocol = "tcp"
+        ports    = ["22"]
+      }]
+    }
+    storage_resources = {
+      server_name  = "zfs-fileserver"
+      machine_type = "n1-standard-4"
+      disk_name    = "zfs-fs-storage"
+      disk_type    = "pd-standard"
+      disk_size_gb = 10000
+      zone         = "us-east1-c"
+    }
+    members = ["group:another-group@gcp.pennbrain.upenn.edu","user:joe@gcp.pennbrain.upenn.edu","org:fluidnumerics.com"]
   }
-  storage_resources = {
-    server_name  = "zfs-fileserver"
-    machine_type = "n1-standard-4"
-    disk_name    = "zfs-fs-storage"
-    disk_type    = "pd-standard"
-    disk_size_gb = "2000"
-    zone         = "us-east1-b"
-  }
-  members = ["group:my-group@domain.edu"]
 }]
