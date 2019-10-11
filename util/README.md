@@ -36,6 +36,6 @@ mv ~/Downloads/client_secret.json ./credentials.json
 The provided script `update_directory.py` is used to update the POSIX username, user id (uid), group id (gid), home directory, and default shell associated with a Cloud Identity or GSuite e-mail address.
 
 ```
-python update_directory.py
+python update_directory.py joe@fluidnumerics.com --username=joe --uid=2001 --gid=2000 --home_dir=/home/joe --shell="/bin/bash" -key=$(cat /home/joe/.ssh/id_rsa.pub)
 ```
 
