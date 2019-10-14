@@ -217,4 +217,7 @@ data "google_iam_policy" "user" {
     role = "organizations/900475861822/roles/BSCInstanceUser"
     members = var.service_projects[count.index].members
   }
+  binding { 
+    role = "roles.project.editor"
+    members = "${local.project_id[count.index]}-compute@developer.gserviceaccount.com"
 }
