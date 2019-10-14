@@ -50,7 +50,6 @@ resource "google_compute_subnetwork" "subnets" {
   project       = var.host_vpc_project_id
 }
 
-
 resource "google_compute_firewall" "firewall-rules" {
   name          = "${var.license_project.name}-firewall"
   source_ranges = var.license_project.network_resources.source_ranges
@@ -98,6 +97,14 @@ resource "google_compute_instance" "license-servers" {
     access_config {
       // Static IP
       nat_ip = google_compute_address.static_ip.address
+    }
+  }
+
+  network_interface {
+
+    network = "default"
+    access_config {
+      // Ephemeral IP
     }
   }
 
