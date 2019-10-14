@@ -219,5 +219,6 @@ data "google_iam_policy" "user" {
   }
   binding { 
     role = "roles.project.editor"
-    members = "${local.project_id[count.index]}-compute@developer.gserviceaccount.com"
+    members = ["${local.project_id[count.index]}-compute@developer.gserviceaccount.com"]
+  }
 }
