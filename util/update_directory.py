@@ -53,52 +53,56 @@ def update_user_posix_credentials(user_email, home_dir, username, shell, uid, gi
         posix_account = user['posixAccounts'][0]
         print('Existing POSIX account info:')
         print(posix_account)
-
-        # Update credentials
-        posix_modified = False
-
-        if home_dir:
-            posix_account['homeDirectory'] = home_dir
-            posix_modified = True
-
-        if username:
-            posix_account['username'] = username
-            posix_modified = True
-
-        if shell:
-            posix_account['shell'] = shell
-            posix_modified = True
-
-        if uid:
-            posix_account['uid'] = str(uid)
-            posix_modified = True
-
-        if gid:
-            posix_account['gid'] = str(gid)
-            posix_modified = True
-
-        if posix_modified:
-            update_command = service.users().update(userKey=user_email,
-                                                    body={'posixAccounts': [posix_account]})
-            update_command.execute()
-
-
-            print('POSIX account info updated; changes may take a few seconds to propagate. '
-                  'Check `gcloud beta compute os-login describe-profile` for changes')
-
-        if key:
-            public_keys = user['sshPublicKeys'][0]
-            public_keys['key'] = key
-            update_command = service.users().update(userKey=user_email,
-                                                body={'sshPublicKeys': [public_keys]})
-            update_command.execute()
-            print('Public RSA Key info updated; changes may take a few seconds to propagate. '
-                  'Check `gcloud beta compute os-login describe-profile` for changes')
-
-    else:
-        print('Error: posixAccounts is not associated with output of admin.users().get()')
+    else :
+        print( 'No POSIX account information found. Creating POSIX account metadata' )
         pprint.pprint( user )
-        print('Nothing updated')
+        posix_account = {}
+
+    # Update credentials
+    posix_modified = False
+
+    if home_dir:
+        posix_account['homeDirectory'] = home_dir
+        posix_modified = True
+
+    if username:
+        posix_account['username'] = username
+        posix_modified = True
+
+    if shell:
+        posix_account['shell'] = shell
+        posix_modified = True
+
+    if uid:
+        posix_account['uid'] = str(uid)
+        posix_modified = True
+
+    if gid:
+        posix_account['gid'] = str(gid)
+        posix_modified = True
+
+    if posix_modified:
+        update_command = service.users().update(userKey=user_email,
+                                                body={'posixAccounts': [posix_account]})
+        update_command.execute()
+
+
+        print('POSIX account info updated; changes may take a few seconds to propagate. '
+              'Check `gcloud beta compute os-login describe-profile` for changes')
+
+    if key:
+        if 'sshPublicKeys' in user.keys():
+            public_keys = user['sshPublicKeys'][0]
+        else:
+            public_keys = {}
+
+        public_keys['key'] = key
+
+        update_command = service.users().update(userKey=user_email,
+                                            body={'sshPublicKeys': [public_keys]})
+        update_command.execute()
+        print('Public RSA Key info updated; changes may take a few seconds to propagate. '
+              'Check `gcloud beta compute os-login describe-profile` for changes')
 
 
 def main():
