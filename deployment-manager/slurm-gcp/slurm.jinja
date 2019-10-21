@@ -77,6 +77,9 @@ resources:
         - key: slurm_resume
           value: |
             {{ imports["scripts/resume.py"]|indent(12)|replace("@PROJECT@",env["project"])|replace("@REGION@",properties["region"])|replace("@EXTERNAL_COMPUTE_IPS@",properties["external_compute_ips"])|replace("@CLUSTER_NAME@",properties["cluster_name"])|replace("@VPC_SUBNET@",properties["vpc_subnet"])|replace("@SHARED_VPC_HOST_PROJ@",properties["shared_vpc_host_proj"])|replace("@PARTITIONS@",properties["partitions"])|replace("@NETWORK_TAG@",properties["network_tag"]) }}
+        - key: compute-startup-script
+          value: |
+          {{ imports["scripts/compute-startup-script.sh"]|indent(12)|replace("@MOUNT_DIR@",properties["data_mount_dir"]|replace("@GID@",properties["data_owner_gid"])|replace("@NFS_DATA_SERVER@",properties["nfs_data_server"])|replace("@NFS_DATA_SERVER@",properties["nfs_data_server"]) }}
         - key: slurm_suspend
           value: |
             {{ imports["scripts/suspend.py"]|indent(12)|replace("@PROJECT@",env["project"])|replace("@PARTITIONS@",properties["partitions"]) }}

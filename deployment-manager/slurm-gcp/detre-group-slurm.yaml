@@ -49,6 +49,11 @@ resources:
     nfs_apps_server : zfs-fileserver
     nfs_apps_dir    : "/mnt/zfs/apps"
 
+    nfs_data_server : zfs-fileserver
+    nfs_data_dir    : "/mnt/zfs/data"
+    data_owner_gid  : "3000"
+    data_mount_dir  : "/mnt/detre-group"
+
     nfs_home_server : zfs-fileserver
     nfs_home_dir    : "/mnt/zfs/home"
 

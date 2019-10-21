@@ -112,10 +112,9 @@ def create_instance(compute, project, zone, instance_type, instance_name,
         'value': shutdown_script
     })
 
-    if not have_compute_img:
-        startup_script = open(
-            '/apps/slurm/scripts/startup-script.py', 'r').read()
-        config['metadata']['items'].append({
+    startup_script = open(
+            '/apps/slurm/scripts/compute-startup-script.sh', 'r').read()
+    config['metadata']['items'].append({
             'key': 'startup-script',
             'value': startup_script
         })

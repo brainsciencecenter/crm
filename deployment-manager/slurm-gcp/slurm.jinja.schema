@@ -22,6 +22,7 @@ info:
     Create a Slurm cluster in GCP.
 
 imports:
+- path: scripts/compute-startup-script.sh
 - path: scripts/compute-shutdown
 - path: scripts/custom-compute-install
 - path: scripts/custom-controller-install
@@ -52,12 +53,14 @@ optional:
 - controller_secondary_disk_size_gb
 - cpu_platform
 - external_compute_ips
+- gid
 - gpu_count
 - gpu_type
 - login_disk_size_gb
 - login_disk_type
 - login_labels
 - login_node_count
+- data_mount_dir
 - munge_key
 - nfs_apps_dir
 - nfs_apps_server
@@ -118,6 +121,14 @@ properties:
     maximum     : 64000
     description : Size of disk for the secondary disk.
 
+  data_mount_dir:
+    type        : string
+    default     : data
+    description : Subdirectory of /mnt on slurm-gcp instances where shared data server directory will be mounted.
+
+  data_owner_gid:
+    type : string
+    description : The POSIX group id number for the group owner of the file server hosting group data.
 
   default_account:
     type        : string
@@ -180,6 +191,15 @@ properties:
     description : location of the nfs_apps directory on the nfs_apps_server.
 
   nfs_apps_server:
+    type        : string
+    description : IP address of NFS server hosting apps dir
+
+  nfs_data_dir:
+    type        : string
+    default     : /mnt/zfs/data
+    description : location of the nfs_data directory on the nfs_data_server.
+
+  nfs_data_server:
     type        : string
     description : IP address of NFS server hosting apps dir
 
