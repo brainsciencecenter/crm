@@ -3,7 +3,7 @@
 This directory contains tools for preparing a zfs fileserver for a user project.
 
 ## Setup
-Before using these scripts, you will need to perform the following prerequisite steps if a user project has not had a slurm-gcp cluster previously.
+Before using these scripts, you will need to perform the following prerequisite steps if a user project has not user deployment manager previously.
 
 1. Enable the deployment manager API on the user project
 ```
@@ -25,7 +25,7 @@ $ gcloud config set project detre-group-dd34a9
 $ cp zfs.yaml detre-group-zfs.yaml
 ```
 
-3. Modify the service project settings and slurm-gcp cluster settings in your copy of slurm-cluster.yaml
+3. Modify the service project settings and file server settings in your copy of zfs.yaml
 **Service Project Settings**
 ```
     name                    : zfs-fileserver

@@ -11,14 +11,11 @@
 /******************************************
   Project random id suffix configuration
  *****************************************/
-resource "random_id" "random_project_id_suffix" {
-  byte_length = 5
-}
 
 # Create the host project and associate with a billing account
 resource "google_project" "project" {
   name       = var.name
-  project_id = format("%s-%s",var.project_id_base,random_id.random_project_id_suffix.hex)
+  project_id = var.project_id 
   folder_id  = var.parent_folder
   billing_account = var.billing_account
 }

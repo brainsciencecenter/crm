@@ -1,6 +1,11 @@
 # crm/resources
 
 This directory hosts the terraform scripts for creating the GCP resources and desired folder hierarchy for the BSC POC project.
+The scripts create a folder that contains all projects and resources (`services_folder`)
+Under the folder, a host project is created that hosts the shared VPC network, subnets, and firewall rules.
+Service projects are projects that are created with IAM settings and firewall rules.
+
+To create additional resources under projects, see the [crm/deployment-manager](../crm/deployment-manager) directory.
 
 ## Pre-requisites
 [An excellent tutorial for getting started with resource management with terraform](https://cloud.google.com/community/tutorials/managing-gcp-projects-with-terraform)
@@ -24,57 +29,42 @@ To use these scripts, edit the provided terraform variables file ( template.tfva
 credentials_path      = "TO DO : Enter the full path to the credentials file for your terraform service account"
 parent_resource_node  = "TO DO : Enter the resource hierarchy node that host the projects and folders created from these scripts."
 billing_account       = "TO DO : Enter the billing account ID that will be used for all host and service project resources"
+services_folder       = "pennbrain-services"
 
 host_project={
   name = "host-project"
   network_name = "bsc-host-network"
-  parent_folder = "services"
-  project_id_base = "bsc-host"
+  project_id   = "pennbrain-host-3097383fff"
 }
 
-license_project = {
-  name                 = "license"
-  network_resources    = {
-    subnet_cidr      = "10.10.0.0/16"
-    subnet_region    = "us-east1"
-    source_ranges    = ["10.20.0.0/16"]
-    allow            = [
-    { protocol = "tcp"
-      ports    = ["27000"]
-    }]
-  }
-  compute_resources = [
-    { server_name  = "matlab-flexnet"
-      machine_type = "n1-standard-4"
-      disk_type    = "pd-standard"
-      disk_size_gb = 25
-      zone         = "us-east1-b"
+service_projects = [
+  { name                 = "pennbrain-license"
+    project_id           = "pennbrain-license-82eff5"
+    network_resources    = {
+      subnet_cidr      = "10.10.0.0/16"
+      subnet_region    = "us-east1"
+      source_ranges    = ["10.20.0.0/16"]
+      allow            = [
+      { protocol = "tcp"
+        ports    = ["27000","27001","1049"]
+      }]
     }
-  ]
-}
-
-user_projects = [
-{ name            = "service-project-sandbox"
-  parent_folder   = "services"
-  network_resources = {
-    subnet_cidr = "10.20.0.0/16"
-    subnet_region = "us-east1"
-    source_ranges = ["0.0.0.0/0"]
-    allow = [
-    { protocol = "tcp"
-      ports    = ["22"]
-    }]
+    members = ["group:admin@gcp.pennbrain.upenn.edu"]
+  },
+  { name            = "detre-group"
+    project_id      = "detre-group-dd34a9"
+    network_resources = {
+      subnet_cidr = "10.20.0.0/16"
+      subnet_region = "us-east1"
+      source_ranges = ["0.0.0.0/0"]
+      allow = [
+      { protocol = "tcp"
+        ports    = ["22"]
+      }]
+    }
+    members = ["group:detre-group@gcp.pennbrain.upenn.edu"]
   }
-  storage_resources = {
-    server_name  = "zfs-fileserver"
-    machine_type = "n1-standard-4"
-    disk_name    = "zfs-fs-storage"
-    disk_type    = "pd-standard"
-    disk_size_gb = "2000"
-    zone         = "us-east1-b"
-  }
-  members = ["group:my-group@domain.edu"]
-}]
+]
 ```
 Note that the `members` field under `user_projects` refers to members being provided the BSC User role.
 
