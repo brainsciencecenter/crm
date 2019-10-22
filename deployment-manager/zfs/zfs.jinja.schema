@@ -1,0 +1,124 @@
+# Copyright 2017 SchedMD LLC.
+# Modified for use with the Slurm Resource Manager.
+#
+# Copyright 2015 Google Inc. All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+info:
+  title: A template for creating a ZFS fileserver.
+  author: Fluid Numerics LLC
+  description: |
+    Create a ZFS fileserver in GCP.
+
+imports:
+- path: scripts/startup-script.py
+
+required:
+- name
+- machine_type
+- network_tag
+- private_google_access
+- region
+- zone
+
+optional:
+- boot_disk_type
+- boot_disk_size_gb
+- labels
+- storage_disk_type
+- storage_disk_size_gb
+- cpu_platform
+- data_owner_gid
+- shared_vpc_host_proj
+- vpc_net
+- vpc_subnet
+
+properties:
+
+  name:
+    type        : string
+    description : Name of the fileserver
+
+  machine_type:
+    type        : string
+    description : Machine type to use for the fileserver.
+                  eg. n1-standard-4.
+
+  boot_disk_type:
+    enum        : ["pd-ssd", "pd-standard"]
+    default     : pd-standard
+    description : Disk type (pd-ssd or pd-standard) for boot disk.
+
+  boot_disk_size_gb:
+    type        : integer
+    default     : 10
+    minimum     : 10
+    maximum     : 2000
+    description : Size of the boot disk.
+
+  labels:
+    type        : object
+    default     : {}
+    description : Labels to add to fileserver instance. List of key key, value
+                  pairs.
+
+  storage_disk_type:
+    enum        : ["pd-ssd", "pd-standard"]
+    default     : pd-standard
+    description : Disk type (pd-ssd or pd-standard) for storage disk.
+
+  storage_disk_size_gb:
+    type        : integer
+    default     : 100
+    minimum     : 10
+    maximum     : 64000
+    description : Size of disk for the storage disk.
+
+  data_owner_gid:
+    type : string
+    description : The POSIX group id number for the group owner of the file server hosting group data.
+
+  network_tag:
+    type        : string
+    description : Tag to use for aligning slurm-gcp resources with BSC shared network
+     
+  private_google_access:
+    type        : boolean
+    default     : True
+    description : Private Google Access is Enabled (True/False).
+
+  region:
+    type        : string
+    description : Region to run the instances in.
+
+  shared_vpc_host_project:
+    type        : string
+    description : Shared VPC network that this project has been granted access
+                  to. Default service account and APIs service agent must be
+                  granted "Network User" role in host project. Requires external
+                  IPs or Cloud NAT configured in host project.
+
+  vpc_net:
+    type        : string
+    description : The name of the pre-defined VPC network you want the nodes
+                  to attach to based on Region.
+
+  vpc_subnet:
+    type        : string
+    description : The name of the pre-defined VPC subnet you want the nodes
+                  to attach to based on Region.
+  zone:
+    type        : string
+    description : Zone to run the instances in based on Region.
+
